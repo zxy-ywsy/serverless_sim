@@ -1,3 +1,13 @@
+<template>
+  <div class="col_container sidebar">
+    <!-- 新增的网络拓扑图链接 -->
+    <div @click="navigateToTopology">网络拓扑图</div>
+    <div v-for="(value, key) in records" :key="key" @click="item_click(key)">
+      {{ "_" + key in selected_keys ? ">" : "" }}{{ value }}
+    </div>
+  </div>
+</template>
+
 <script lang="ts">
 import { request } from "@/request";
 export default {
@@ -10,15 +20,13 @@ export default {
 
   mounted() {
     request
-      .history_list()
-      .request()
-      .then((history_list) => {
-        console.log("history list", history_list);
-        this.records = ["当前仿真监控"].concat(history_list.data.list);
-      });
+        .history_list()
+        .request()
+        .then((history_list) => {
+          console.log("history list", history_list);
+          this.records = ["当前仿真监控"].concat(history_list.data.list);
+        });
   },
-
-  unmounted() {},
 
   methods: {
     init(_select_bar: (idx: number) => void) {
@@ -27,24 +35,12 @@ export default {
     item_click(key) {
       this._select_bar(key, this.records[key]);
     },
-  },
-
-  props: {
-    selected_keys: {
-      type: Object,
-      default: {},
-    },
+    navigateToTopology() {
+      this.$router.push({ name: 'NetworkTopology' });
+    }
   },
 };
 </script>
-
-<template>
-  <div class="col_container sidebar">
-    <div v-for="(value, key) in records" :key="key" @click="item_click(key)">
-      {{ "_" + key in selected_keys ? ">" : "" }}{{ value }}
-    </div>
-  </div>
-</template>
 
 <style scoped>
 .row {
@@ -59,3 +55,5 @@ export default {
   overflow: scroll;
 }
 </style>
+
+
