@@ -7,6 +7,17 @@ export class UINode{
     }
 }
 
+export class UILink{
+    constructor(
+        public source: { x: number, y: number },
+        public target: { x: number, y: number },
+        public bandwidth: number,
+        public color: string
+    ) {
+    }
+}
+
 export class Topo{
-    nodes: Node[]
+    nodes: UINode[];
+    links: UILink[];
 }

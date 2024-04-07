@@ -46,6 +46,7 @@
 <script>
 import { request } from "@/request";
 import {UINode} from "@/network_topo";
+import {UILink} from "@/network_topo";
 
 export default {
   data() {
@@ -89,6 +90,7 @@ export default {
     this.nodes.push(new UINode(50,50,12,1));
     this.nodes.push(new UINode(100,150,5,2));
     this.nodes.push(new UINode(70,80,9,3));
+    this.links.push(new UILink({200:300},{50:50},100,"black"));
 
   },
   methods: {
