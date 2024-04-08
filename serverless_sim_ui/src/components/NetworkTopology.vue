@@ -1,11 +1,6 @@
 <template>
   <div class="network-topology">
     <h1>网络拓扑图</h1>
-<!--    @mousedown="startDragging"：当鼠标在容器上按下时触发 startDragging 方法，用于开始拖动操作。-->
-<!--    @mousemove="dragging"：当鼠标在容器上移动时触发 dragging 方法，用于实时更新拖动节点的位置。-->
-<!--    @mouseup="stopDragging"：当鼠标在容器上释放时触发 stopDragging 方法，用于结束拖动操作。-->
-<!--    @mouseleave="stopDragging"：当鼠标移出容器时触发 stopDragging 方法，同样用于结束拖动操作。-->
-<!--    {{nodes}}-->
     <div
         class="topology-container"
         @mousedown="startDragging"
@@ -13,7 +8,6 @@
         @mouseup="stopDragging"
         @mouseleave="stopDragging"
     >
-      <!--循环显示所有节点（.node），每个节点的位置根据其数据模型中的x和y坐标动态设置-->
       <div
           v-for="(node, index) in nodes"
           :key="index"
@@ -24,116 +18,103 @@
           @mouseup="stopNodeDragging"
       >
         {{ node.id }}
+        <button @click="removeNode(index)" class="remove-node-btn">删除</button>
       </div>
     </div>
     <svg class="connection-lines">
-<!--        画连线-->
       <line
-          v-for="(link, index) in links"
-          :key="index"
-          :x1="link.source.x"
-          :y1="link.source.y"
-          :x2="link.target.x"
-          :y2="link.target.y"
-          :stroke="link.color"
-          stroke-width="2"
-      />
-    </svg>
-  </div>
+          v-for="(link, key) in links"
+          :key="key"
+          :x1="nodes[link.source[0]].x"
+          :y1="nodes[link.source[0]].y"
+          :x2="nodes[link.source[1]].x"
+          :y2="nodes[link.source[1]].y"
 
+      />
+      <text
+          v-for="(link, key) in links"
+          :key="'text_' + key"
+          :x="(nodes[link.source[0]].x + nodes[link.target[0]].x) / 2"
+          :y="(nodes[link.source[0]].y + nodes[link.target[0]].y) / 2"
+          dominant-baseline="middle"
+          text-anchor="middle"
+          fill="black"
+          font-size="14"
+      >
+        {{ link.bandwidth }}
+        <foreignObject :x="((nodes[link.source[0]].x + nodes[link.target[0]].x) / 2) - 20" :y="((nodes[link.source[0]].y + nodes[link.target[0]].y) / 2) - 20" width="40" height="40">
+          <input type="text" v-model="link.bandwidth" style="width: 40px; height: 20px; font-size: 12px; padding: 2px;" />
+        </foreignObject>
+      </text>
+    </svg>
+    <button @click="addNode" class="add-node-btn">添加节点</button>
+  </div>
 </template>
 
 <script>
-import { request } from "@/request";
-import {UINode} from "@/network_topo";
-import {UILink} from "@/network_topo";
+import { UINode } from "@/network_topo";
+import { UILink } from "@/network_topo";
 
 export default {
   data() {
     return {
       nodes: [],
-      links: [],
+      links: new Map(),
       draggingNode: null,
       offset: { x: 0, y: 0 },
     };
   },
-  mounted() {
-    // 从后端获取节点拓扑图数据
-    const prepare=((data) => {
-      // 生成节点数据
-      this.nodes = data.nodes.map((node) => ({
-        id: node.node_id,
-        x: Math.random() * 500, // 随机生成 x 坐标
-        y: Math.random() * 500, // 随机生成 y 坐标
-        zIndex: 0, // 设置节点层级
-      }));
-
-      // 生成连接线数据
-      this.links = [];
-      data.nodes.forEach((node1, index1) => {
-        data.nodes.forEach((node2, index2) => {
-          if (index1 < index2) {
-            const bandwidth = node1.bandwidth[node2.node_id];
-            if (bandwidth > 0) {
-              this.links.push({
-                source: { x: this.nodes[index1].x, y: this.nodes[index1].y },
-                target: { x: this.nodes[index2].x, y: this.nodes[index2].y },
-                bandwidth: bandwidth,
-                color: "black", // 设置连接线颜色
-              });
-            }
-          }
-        });
-      });
-    });
-    this.nodes.push(new UINode(200,300,6,0));
-    this.nodes.push(new UINode(50,50,12,1));
-    this.nodes.push(new UINode(100,150,5,2));
-    this.nodes.push(new UINode(70,80,9,3));
-    this.links.push(new UILink({200:300},{50:50},100,"black"));
-
-  },
   methods: {
     startDragging(event) {
-      // 记录拖动起始点的偏移量
       this.offset.x = event.pageX;
       this.offset.y = event.pageY;
     },
     dragging(event) {
-      console.log("dragging ",this.draggingNode)
-      // 判断是否在拖动中
       if (this.draggingNode !== null) {
         const newX = event.pageX - this.offset.x + this.nodes[this.draggingNode].x;
         const newY = event.pageY - this.offset.y + this.nodes[this.draggingNode].y;
-        // 更新节点位置
         this.nodes[this.draggingNode].x = newX;
         this.nodes[this.draggingNode].y = newY;
-        // 更新偏移量
         this.offset.x = event.pageX;
         this.offset.y = event.pageY;
       }
     },
     stopDragging() {
-      // 结束拖动
       this.draggingNode = null;
     },
     startNodeDragging(index) {
-      // 开始拖动节点
       this.draggingNode = index;
-      // 提高节点层级，使其显示在最前面
       this.nodes[index].zIndex = 1;
     },
-    nodeDragging(event, index) {
-      // 节点拖动过程中的处理
-      // event.stopPropagation();
-    },
     stopNodeDragging() {
-      // 结束节点拖动
       if (this.draggingNode !== null) {
-        // 恢复节点层级
         this.nodes[this.draggingNode].zIndex = 0;
       }
       this.draggingNode = null;
+    },
+    removeNode(index) {
+      this.nodes.splice(index, 1);
+      this.links.forEach((link) => {
+        if (link.source[0] === index || link.target[0] === index) {
+          this.links.delete(link);
+        }
+      });
+    },
+    addNode() {
+      const newNode = new UINode(Math.random() * 500, Math.random() * 500, 0, this.nodes.length);
+      this.nodes.push(newNode);
+      this.connectNodes(this.nodes.length - 1);
+    },
+    connectNodes(nodeIndex) {
+      for (let i = 0; i < this.nodes.length; i++) {
+        if (i !== nodeIndex) {
+          const key = Math.min(nodeIndex, i) + '_' + Math.max(nodeIndex, i);
+          if (!this.links.has(key)) {
+            const newLink = new UILink([nodeIndex, i], 0, 0, 0);
+            this.$set(this.links, key, newLink);
+          }
+        }
+      }
     },
   },
 };
@@ -151,8 +132,8 @@ export default {
 }
 .node {
   position: absolute;
-  width: 40px;
-  height: 40px;
+  width: 80px;
+  height: 80px;
   background-color: #2196F3;
   border-radius: 50%;
   display: flex;
@@ -160,7 +141,7 @@ export default {
   align-items: center;
   color: white;
   font-size: 16px;
-  cursor: move; /* 允许拖动 */
+  cursor: move;
 }
 .connection-lines {
   position: absolute;
@@ -169,5 +150,17 @@ export default {
   width: 100%;
   height: 100%;
   pointer-events: none;
+}
+.remove-node-btn {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.add-node-btn {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 </style>

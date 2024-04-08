@@ -1,23 +1,25 @@
-export class UINode{
+export class UINode {
     constructor(
-        public x:number,
-        public y:number,
-        public zIndex:number,
-        public id:number) {
-    }
+        public x: number,
+        public y: number,
+        public zIndex: number,
+        public id: number,
+        public index: number
+    ) {}
 }
 
-export class UILink{
+export class UILink {
     constructor(
-        public source: { x: number, y: number },
-        public target: { x: number, y: number },
-        public bandwidth: number,
-        public color: string
-    ) {
-    }
+        public source: [number, number],
+        public midX: number,
+        public midY: number,
+        public bandwidth: number
+    ) {}
 }
 
-export class Topo{
-    nodes: UINode[];
-    links: UILink[];
+export class Topo {
+    constructor(
+        public nodes: UINode[],
+        public links: Map<string, UILink>
+    ) {}
 }
