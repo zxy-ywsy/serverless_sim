@@ -10,11 +10,14 @@
 
 <script lang="ts">
 import { request } from "@/request";
+import {page} from "@/page";
+
 export default {
   data() {
     return {
       records: ["当前仿真监控", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       _select_bar: (idx: number, name: string) => {},
+
     };
   },
 
@@ -29,7 +32,7 @@ export default {
   },
 
   methods: {
-    init(_select_bar: (idx: number) => void) {
+    init(_select_bar: (select: number, select_name: string) => void) {
       this._select_bar = _select_bar;
     },
     item_click(key) {
