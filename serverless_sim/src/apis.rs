@@ -8,9 +8,9 @@ use crate::network::ApiHandlerImpl;
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(untagged)]
-pub enum GetNetworkTopoResp{
+pub enum GetTopoResp{
     Exist{
-        topo:Vec<Vec<i32>>,
+        topo:Vec<Vec<f64>>,
 },
     NotFound{
         msg:String,
@@ -18,11 +18,11 @@ pub enum GetNetworkTopoResp{
 
 }
 
-impl GetNetworkTopoResp {
+impl GetTopoResp {
     fn id(&self)->u32 {
         match self {
-                GetNetworkTopoResp::Exist{..}=>1,
-    GetNetworkTopoResp::NotFound{..}=>2,
+                GetTopoResp::Exist{..}=>1,
+    GetTopoResp::NotFound{..}=>2,
 
         }
     }
@@ -36,20 +36,15 @@ impl GetNetworkTopoResp {
 
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct GetNetworkTopoReq {
+pub struct GetTopoReq {
         env_id:String,
-        a:i32,
-        b:f64,
-        c:bool,
-        d:Vec<i32>,
-        e:Vec<Vec<i32>>,
 }
 
 
 #[async_trait]
 pub trait ApiHandler {
     
-    async fn handle_get_network_topo(&self, req:GetNetworkTopoReq)->GetNetworkTopoResp;
+    async fn handle_get_topo(&self, req:GetTopoReq)->GetTopoResp;
             
 }
 
@@ -57,11 +52,11 @@ pub trait ApiHandler {
 pub fn add_routers(mut router:Router)->Router
 {
     
-    async fn get_network_topo(Json(req):Json<GetNetworkTopoReq>)-> (StatusCode, Json<GetNetworkTopoResp>){
-        (StatusCode::OK, Json(ApiHandlerImpl.handle_get_network_topo(req).await))
+    async fn get_topo(Json(req):Json<GetTopoReq>)-> (StatusCode, Json<GetTopoResp>){
+        (StatusCode::OK, Json(ApiHandlerImpl.handle_get_topo(req).await))
     }
     router=router
-        .route("/get_network_topo", post(get_network_topo));
+        .route("/get_topo", post(get_topo));
                              
     
     router

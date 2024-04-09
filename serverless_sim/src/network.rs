@@ -9,13 +9,14 @@ use std::{
     io::Read,
     sync::{Arc, Mutex, RwLock},
 };
-use crate::apis::{ApiHandler,GetNetworkTopoReq,GetNetworkTopoResp};
+use crate::apis::{ApiHandler,GetTopoReq,GetTopoResp};
 use crate::{
     config::Config,
     metric::{self, Records},
     sim_env::SimEnv,
 };
 use async_trait::async_trait;
+
 
 pub async fn start() {
     // build our application with a route
@@ -54,10 +55,9 @@ pub struct ApiHandlerImpl;
 
 #[async_trait]
 impl ApiHandler for ApiHandlerImpl {
-
-    async fn handle_get_network_topo(&self, req: GetNetworkTopoReq) -> GetNetworkTopoResp {
-        GetNetworkTopoResp::Exist {
-            topo: vec![vec![1, 2, 3], vec![4, 5, 6]],
+    async fn handle_get_topo(&self, req:GetTopoReq)->GetTopoResp{
+        GetTopoResp::Exist{
+            topo:vec![vec![1.0,2.0],vec![3.0,4.0]],
         }
     }
 }

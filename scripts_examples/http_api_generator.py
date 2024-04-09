@@ -187,8 +187,8 @@ def gen_front_ts():
         apis+=f"""
 {resp_content}
 {req_struct}
-class ApiCaller {{
-    async {api_name}(req:{reqtype}):Promise<{resptype}>{{
+export namespace apis {{
+    async function {api_name}(req:{reqtype}):Promise<{resptype}>{{
         return {FRONTEND["http_call"].format(api_name)}
     }}
 }}
@@ -227,7 +227,7 @@ use async_trait::async_trait;
         
         api_registers.append(f"""
     async fn {api_name}(Json(req):Json<{reqtype}>)-> (StatusCode, Json<{resptype}>){{
-        (StatusCode::OK, Json(ApiHandlerImpl.handle_get_network_topo(req).await))
+        (StatusCode::OK, Json(ApiHandlerImpl.handle_{api_name}(req).await))
     }}
     router=router
         .route("/{api_name}", post({api_name}));

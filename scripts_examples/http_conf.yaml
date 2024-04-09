@@ -10,18 +10,14 @@ frontend:
     http_call: 'await axios.post("/api/{}", req)'
 
 api_list:
-    get_network_topo:
+    # get the network topology for spec sim_env
+    get_topo:
         req: 
             env_id : "String"
-            a: "Int"
-            b: "Float"
-            c: "Bool"
-            d: ["Array", "Int"]
-            e: ["Array", ["Array", "Int"]]
 
         resp_dispatch:
             Exist: 
-                topo: ["Array",["Array", "Int"]]
+                topo: ["Array", ["Array", "Float"]]
             NotFound:
                 msg: "String" 
     

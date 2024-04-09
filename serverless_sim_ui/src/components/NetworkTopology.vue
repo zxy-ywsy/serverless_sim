@@ -47,7 +47,7 @@
 <script>
 import { UINode } from "@/network_topo";
 import { UILink } from "@/network_topo";
-
+import { apis } from "@/apis";
 export default {
   data() {
     return {
@@ -59,6 +59,9 @@ export default {
       editedBandwidth: null,
       selectedLinkId: null,
     };
+  },
+  mounted() {
+    // apis.get_topo().
   },
   methods: {
     startDragging(event) {

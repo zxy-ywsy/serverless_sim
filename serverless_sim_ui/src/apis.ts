@@ -2,30 +2,30 @@ import axios from "axios"
 
 
 
-class GetNetworkTopoRespExist {
+class GetTopoRespExist {
     constructor(
         public topo:number[][],
     ){}
 }
 
-class GetNetworkTopoRespNotFound {
+class GetTopoRespNotFound {
     constructor(
         public msg:string,
     ){}
 }
 
-class GetNetworkTopoResp{
+class GetTopoResp{
     kernel: any
     private id: number=0
     
-    exist():undefined| GetNetworkTopoRespExist{
+    exist():undefined| GetTopoRespExist{
         if(this.id==1){
             return this.kernel
         }
         return undefined
     }
     
-    not_found():undefined| GetNetworkTopoRespNotFound{
+    not_found():undefined| GetTopoRespNotFound{
         if(this.id==2){
             return this.kernel
         }
@@ -35,20 +35,15 @@ class GetNetworkTopoResp{
 }
 
 
-class GetNetworkTopoReq {
+class GetTopoReq {
     constructor(
         public env_id:string,
-        public a:number,
-        public b:number,
-        public c:boolean,
-        public d:number[],
-        public e:number[][],
     ){}
 }
 
-class ApiCaller {
-    async get_network_topo(req:GetNetworkTopoReq):Promise<GetNetworkTopoResp>{
-        return await axios.post("/api/get_network_topo", req)
+export namespace apis {
+    async function get_topo(req:GetTopoReq):Promise<GetTopoResp>{
+        return await axios.post("/api/get_topo", req)
     }
 }
 
